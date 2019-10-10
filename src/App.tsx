@@ -9,14 +9,21 @@ const App: React.FC = () => {
     "https://hn.algolia.com/api/v1/search?query=redux"
   );
   const [isLoadgin, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsError(false);
       setIsLoading(true);
 
-      const result = await axios(url);
+      try {
+        const result = await axios(url);
 
-      setData(result.data);
+        setData(result.data);
+      } catch (error) {
+        setIsError(true);
+      }
+
       setIsLoading(false);
     };
 
@@ -38,6 +45,9 @@ const App: React.FC = () => {
       >
         Search
       </button>
+
+      {isError && <div>Something went wrong ...</div>}
+
       {isLoadgin ? (
         <div>Loading...</div>
       ) : (
