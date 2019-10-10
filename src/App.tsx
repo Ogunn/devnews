@@ -8,12 +8,16 @@ const App: React.FC = () => {
   const [url, setUrl] = useState(
     "https://hn.algolia.com/api/v1/search?query=redux"
   );
+  const [isLoadgin, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+
       const result = await axios(url);
 
       setData(result.data);
+      setIsLoading(false);
     };
 
     fetchData();
@@ -34,16 +38,20 @@ const App: React.FC = () => {
       >
         Search
       </button>
-      <ul>
-        {data &&
-          data.hits.map(item => (
-            <li key={item.objectID}>
-              <a target="blank" href={item.url}>
-                {item.title}
-              </a>
-            </li>
-          ))}
-      </ul>
+      {isLoadgin ? (
+        <div>Loading...</div>
+      ) : (
+        <ul>
+          {data &&
+            data.hits.map(item => (
+              <li key={item.objectID}>
+                <a target="blank" href={item.url}>
+                  {item.title}
+                </a>
+              </li>
+            ))}
+        </ul>
+      )}
     </Fragment>
   );
 };
