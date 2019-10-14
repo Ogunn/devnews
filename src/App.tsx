@@ -2,13 +2,20 @@ import React, { Fragment, useState, useEffect } from "react";
 import axios from "axios";
 import { Data } from "./interfaces/Data";
 
-const App: React.FC = () => {
+/**
+ * https://levelup.gitconnected.com/usetypescript-a-complete-guide-to-react-hooks-and-typescript-db1858d1fb9c
+ */
+type Hook = () => [
+  { data: Data | undefined; isLoading: boolean; isError: boolean },
+  (url: string) => void
+];
+
+const useHackerNewsApi: Hook = () => {
   const [data, setData] = useState<Data>();
-  const [query, setQuery] = useState("redux");
   const [url, setUrl] = useState(
     "https://hn.algolia.com/api/v1/search?query=redux"
   );
-  const [isLoadgin, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
@@ -30,12 +37,19 @@ const App: React.FC = () => {
     fetchData();
   }, [url]);
 
+  return [{ data, isLoading, isError }, setUrl];
+};
+
+const App: React.FC = () => {
+  const [query, setQuery] = useState("redux");
+  const [{ data, isLoading, isError }, doFatch] = useHackerNewsApi();
+
   return (
     <Fragment>
       <form
         onSubmit={e => {
           e.preventDefault();
-          setUrl(`http://hn.algolia.com/api/v1/search?query=${query}`);
+          doFatch(`http://hn.algolia.com/api/v1/search?query=${query}`);
         }}
       >
         <input
@@ -54,7 +68,7 @@ const App: React.FC = () => {
       </form>
       {isError && <div>Something went wrong ...</div>}
 
-      {isLoadgin ? (
+      {isLoading ? (
         <div>Loading...</div>
       ) : (
         <ul>
